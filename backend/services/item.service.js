@@ -8,7 +8,7 @@ exports.createItem = async (data) => {
 
 exports.getItems = async (filters = {}) => {
   const page = filters.page || 1;
-  const limit = filters.limit || 10;
+  const limit = filters.limit || 5;
   const offset = (page - 1) * limit;
 
   const where = {};

@@ -25,13 +25,13 @@ export default function Toast({ message, type = 'success', onClose }) {
   return (
     <div
       role="alert"
-      className={`fixed bottom-6 right-6 flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg backdrop-blur-md transition-smooth animate-float ${current.bgColor} z-50`}
+      className={`fixed bottom-6 right-6 flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg backdrop-blur-md ${current.bgColor} z-50`}
     >
       {current.icon}
       <span className="text-sm font-medium tracking-wide">{message}</span>
       <button
         onClick={onClose}
-        className="ml-2 hover:opacity-75 transition-smooth p-0.5 rounded-lg focus-visible:outline-none"
+        className="ml-2 hover:opacity-75 p-0.5 rounded-lg focus-visible:outline-none"
         aria-label="Close notification"
       >
         <X className="w-4 h-4 text-granny-text" />

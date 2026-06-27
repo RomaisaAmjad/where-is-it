@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Search, Plus, Loader, Inbox, Star, QuestionMark, Package, Home } from 'tabler-icons-react';
 import ItemCard from './components/item-card.component';
 import ItemModal from './components/item-modal.component';
+import DeleteConfirmModal from './components/delete-confirm-modal.component';
 import Pagination from './components/pagination.component';
 import Toast from './components/toast-notification.component';
 import * as itemService from './services/item.service';
@@ -13,7 +14,7 @@ export default function App() {
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
-    limit: 10
+    limit: 5
   });
   const [stats, setStats] = useState({
     totalItems: 0,
@@ -30,6 +31,9 @@ export default function App() {
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+
+  // Delete confirmation modal state
+  const [deleteTargetId, setDeleteTargetId] = useState(null);
 
   // Toast notifications state
   const [toast, setToast] = useState(null);
@@ -49,7 +53,7 @@ export default function App() {
     try {
       const data = await itemService.getItems({
         page,
-        limit: 10,
+        limit: 5,
         search: debouncedSearch.trim() || undefined,
         is_frequently_used: showFrequentlyUsed,
       });
@@ -122,18 +126,29 @@ export default function App() {
     }
   };
 
-  // Delete item
-  const handleDelete = async (itemId) => {
-    if (!window.confirm('Are you sure you want to delete this item?')) return;
+  // Delete item – open the confirmation modal
+  const handleDelete = (itemId) => {
+    setDeleteTargetId(itemId);
+  };
+
+  // Confirmed delete – actually call the API
+  const handleDeleteConfirm = async () => {
     try {
-      const data = await itemService.deleteItem(itemId);
+      const data = await itemService.deleteItem(deleteTargetId);
       if (data.success) {
         showToast('Item deleted successfully.');
         fetchItems();
       }
     } catch (error) {
       showToast('Failed to delete item.', 'error');
+    } finally {
+      setDeleteTargetId(null);
     }
+  };
+
+  // Cancel delete
+  const handleDeleteCancel = () => {
+    setDeleteTargetId(null);
   };
 
   // Trigger editing state
@@ -344,6 +359,13 @@ export default function App() {
           setEditingItem(null);
         }}
         onSubmit={handleFormSubmit}
+      />
+
+      {/* Delete confirmation modal */}
+      <DeleteConfirmModal
+        isOpen={deleteTargetId !== null}
+        onCancel={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
       />
 
       {/* Toast state feedback */}
